@@ -7,7 +7,6 @@ export type Config = { [key: string]: any };
 export const baseConfig: Config = {
   COOKIE_SECRET: 'fixme',
   DB_SYNC: false,
-  DB_USER: process.env.USER,
 }
 
 export const devConfig: Config = {
@@ -42,4 +41,4 @@ switch (process.env.NODE_ENV) {
     throw new Error(`Unknown environment: ${ process.env.NODE_ENV }`);
 }
 
-export default config;
+export default () => config;

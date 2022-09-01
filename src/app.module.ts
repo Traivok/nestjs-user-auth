@@ -7,12 +7,13 @@ import { TypeOrmModule }                                 from '@nestjs/typeorm';
 import { User }                                          from './user/entities/user.entity';
 import * as Joi                                          from 'joi';
 import { CookieSessionModule, NestCookieSessionOptions } from 'nestjs-cookie-session';
+import getConfig                                         from '../config';
 
 @Module({
   imports:     [
     ConfigModule.forRoot({
       isGlobal:         true,
-      envFilePath:      `.env.${ process.env.NODE_ENV ?? 'dev' }`,
+      load:             [ getConfig ],
       validationSchema: Joi.object({
         NODE_ENV:       Joi.string()
                           .valid('dev', 'prod', 'test')
@@ -22,16 +23,15 @@ import { CookieSessionModule, NestCookieSessionOptions } from 'nestjs-cookie-ses
       }),
     }),
 
-    TypeOrmModule.forRoot(),
-    // TypeOrmModule.forRootAsync({
-    //   inject:     [ ConfigService ],
-    //   useFactory: (conf: ConfigService) => ( {
-    //     type:        'postgres',
-    //     database:    conf.get<string>('DB_NAME'),
-    //     entities:    [ User ],
-    //     synchronize: true,
-    //   } ),
-    // }),
+    TypeOrmModule.forRootAsync({
+      inject:     [ ConfigService ],
+      useFactory: (conf: ConfigService) => ( {
+        type:        'postgres',
+        database:    conf.get<string>('DB_NAME'),
+        entities:    [ User ],
+        synchronize: conf.get<boolean>('DB_SYNC'),
+      } ),
+    }),
 
     CookieSessionModule.forRootAsync({
       inject:     [ ConfigService ],
