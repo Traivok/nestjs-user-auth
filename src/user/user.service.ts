@@ -1,26 +1,41 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Injectable, Logger, NotFoundException, NotImplementedException } from '@nestjs/common';
+import { CreateUserDto }                                                  from './dto/create-user.dto';
+import { UpdateUserDto }                                                  from './dto/update-user.dto';
+import { User }                                                           from './entities/user.entity';
+import { InjectRepository }                                               from '@nestjs/typeorm';
+import { Repository }                                                     from 'typeorm';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  private readonly logger = new Logger(UserService.name);
+
+  constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user = this.userRepo.create(createUserDto);
+
+    return this.userRepo.save(user);
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll(): Promise<User[]> {
+    return this.userRepo.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number): Promise<User | undefined> {
+    return await this.userRepo.findOneBy({ id }) ?? undefined;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async findOneOrFail(id: number): Promise<User> {
+    return await this.userRepo.findOneByOrFail({ id });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.findOneOrFail(id);
+    return this.userRepo.save({ ...user, ...updateUserDto });
+  }
+
+  async remove(id: number): Promise<User> {
+    const user = await this.findOneOrFail(id);
+    return await this.userRepo.remove(user);
   }
 }

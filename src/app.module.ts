@@ -1,5 +1,4 @@
 import { Module }                                        from '@nestjs/common';
-import { AppController }                                 from './app.controller';
 import { AppService }                                    from './app.service';
 import { UserModule }                                    from './user/user.module';
 import { ConfigModule, ConfigService }                   from '@nestjs/config';
@@ -7,6 +6,7 @@ import { TypeOrmModule }                                 from '@nestjs/typeorm';
 import { User }                                          from './user/entities/user.entity';
 import * as Joi                                          from 'joi';
 import { CookieSessionModule, NestCookieSessionOptions } from 'nestjs-cookie-session';
+import { CommonsModule } from './commons/commons.module';
 import getConfig                                         from '../config';
 
 @Module({
@@ -41,8 +41,10 @@ import getConfig                                         from '../config';
     }),
 
     UserModule,
+
+    CommonsModule,
   ],
-  controllers: [ AppController ],
+  controllers: [ ],
   providers:   [ AppService ],
 })
 export class AppModule {}

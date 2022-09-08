@@ -1,6 +1,8 @@
-import { NestFactory }                    from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { AppModule }                      from './app.module';
+import { NestFactory }                                            from '@nestjs/core';
+import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger';
+import { AppModule }                                              from './app.module';
+import { CommonsModule }                                          from './commons/commons.module';
+import { UserModule }                                             from './user/user.module';
 
 ( async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,7 +14,6 @@ import { AppModule }                      from './app.module';
     .setDescription('API description')
     .setVersion('1.0')
     .addTag('user')
-    .addTag('report')
     .addCookieAuth('authCookie', {
       type: 'http',
       in: 'Header',
@@ -20,7 +21,10 @@ import { AppModule }                      from './app.module';
     })
     .build();
 
-  SwaggerModule.setup('api', app, SwaggerModule.createDocument(app, swaggerConf));
+  SwaggerModule.setup('api', app, SwaggerModule.createDocument(app, swaggerConf, {
+    deepScanRoutes: true,
+    include: [CommonsModule, UserModule],
+  }));
 
   await app.listen(3000);
 } )();
