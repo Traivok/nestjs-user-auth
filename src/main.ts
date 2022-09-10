@@ -10,15 +10,15 @@ import { UserModule }                                             from './user/u
   app.useLogger([ 'log', 'warn', 'error', 'verbose', 'debug' ]);
 
   const swaggerConf = new DocumentBuilder()
-    .setTitle('Udemy example')
-    .setDescription('API description')
-    .setVersion('1.0')
-    .addTag('user')
-    .addCookieAuth('authCookie', {
-      type: 'http',
-      in: 'Header',
-      scheme: 'Bearer'
-    })
+    .setTitle('User boilerplate')
+    // .setDescription('API description')
+    // .setVersion('1.0')
+    // .addTag('user')
+    // .addCookieAuth('authCookie', {
+    //   type: 'http',
+    //   in: 'Header',
+    //   scheme: 'Bearer'
+    // })
     .build();
 
   SwaggerModule.setup('api', app, SwaggerModule.createDocument(app, swaggerConf, {

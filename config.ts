@@ -1,22 +1,21 @@
-import { ConfigService } from '@nestjs/config';
-
 process.env.NODE_ENV = process.env.NODE_ENV ?? 'dev';
 
 export type Config = { [key: string]: any };
 
 export const baseConfig: Config = {
   COOKIE_SECRET: 'fixme',
+  DB_USER: process.env.USER,
   DB_SYNC: false,
 }
 
 export const devConfig: Config = {
   ...baseConfig,
-  DB_NAME: 'mode_dev',
+  DB_NAME: 'modo_dev',
 }
 
 export const testConfig: Config = {
   ...baseConfig,
-  DB_NAME: 'mode_test',
+  DB_NAME: 'modo_test',
   DB_SYNC: true,
 }
 
