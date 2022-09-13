@@ -9,22 +9,22 @@ export const baseConfig: Config = {
 
 export const devConfig: Config = {
   ...baseConfig,
-  COOKIE_SECRET: 'fixme',
-  DB_NAME: 'modo_dev',
+  COOKIE_SECRET: 'fixme', // FIXME TODO
+  DB_NAME: 'db_dev',
   DB_LOG: true,
 }
 
 export const testConfig: Config = {
   ...baseConfig,
   COOKIE_SECRET: 'secret',
-  DB_NAME: 'modo_test',
+  DB_NAME: 'db_test',
   DB_SYNC: true,
 }
 
 export const prodConfig: Config = {
   ...baseConfig,
-  COOKIE_SECRET: 'fixme',
-  DB_NAME: 'fixme',
+  COOKIE_SECRET: 'fixme', // FIXME TODO
+  DB_NAME: 'db_prod',
 }
 
 let config: Config;
