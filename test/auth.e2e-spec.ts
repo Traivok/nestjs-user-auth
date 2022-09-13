@@ -4,7 +4,6 @@ import * as request                         from 'supertest';
 import { Repository }                       from 'typeorm';
 import { User }                             from '../src/user/entities/user.entity';
 import { AppModule }                        from '../src/app.module';
-import * as session                         from 'express-session';
 
 describe('Authentication Controller (e2e)', () => {
   let app: INestApplication;
@@ -14,7 +13,7 @@ describe('Authentication Controller (e2e)', () => {
     'email':     'user@example.com',
     'firstname': 'John',
     'lastname':  'Doe',
-    'nickname':  'john.doe',
+    'username':  'john.doe',
     'password':  'password',
   };
 
@@ -25,14 +24,8 @@ describe('Authentication Controller (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
 
-    app.useLogger(console);
+    // app.useLogger(console);
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
-
-    app.use(session({
-      secret: 'secret',
-      resave: false,
-      saveUninitialized: false,
-    }));
 
     await app.init();
 
@@ -41,7 +34,7 @@ describe('Authentication Controller (e2e)', () => {
 
   it('Should be able to create new users', async () => {
     return request(app.getHttpServer())
-      .post('/auth/logon')
+      .post('/auth/sign-up')
       .send(user)
       .expect(201)
       .then((res) => {
@@ -49,7 +42,7 @@ describe('Authentication Controller (e2e)', () => {
 
         expect(id).toBeDefined();
         expect(resUser.email).toBe(user.email);
-        expect(resUser.nickname).toBe(user.nickname);
+        expect(resUser.username).toBe(user.username);
 
         userId = id;
       });
@@ -63,8 +56,8 @@ describe('Authentication Controller (e2e)', () => {
       .expect(200);
   });
 
-  it('Should be able to login with nickname', async () => {
-    const { nickname: login, password } = user;
+  it('Should be able to login with username', async () => {
+    const { username: login, password } = user;
     return request(app.getHttpServer())
       .post('/auth/login')
       .send({ login, password })
@@ -83,18 +76,20 @@ describe('Authentication Controller (e2e)', () => {
   it('Should persist sessions', async () => {
     const { email: login, password } = user;
 
-    const res = await request(app.getHttpServer())
+    const res: any = await request(app.getHttpServer())
       .post('/auth/login')
       .send({ login, password })
       .expect(200);
 
-    const cookie = res.get('Set-Cookie');
+    expect(res.body).toBeDefined();
 
-    expect(cookie).toBeDefined();
+    const { access_token } = res.body;
+
+    expect(access_token).toBeDefined();
 
     const { body } = await request(app.getHttpServer())
-      .get('/auth/who-am-i')
-      .set('Cookie', cookie)
+      .get('/auth/profile')
+      .set('Authorization', `Bearer ${ access_token }`)
       .expect(200);
 
     expect(body.email).toBe(user.email);

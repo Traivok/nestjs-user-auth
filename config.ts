@@ -16,6 +16,7 @@ export const devConfig: Config = {
 
 export const testConfig: Config = {
   ...baseConfig,
+  COOKIE_SECRET: 'secret',
   DB_NAME: 'modo_test',
   DB_SYNC: true,
 }

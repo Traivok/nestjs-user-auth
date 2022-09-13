@@ -1,29 +1,52 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { User }                          from '../entities/user.entity';
-import { InjectRepository }              from '@nestjs/typeorm';
-import { Brackets, Repository }          from 'typeorm';
-import { AuthDto }                       from '../dto/auth.dto';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { User }                                  from '../entities/user.entity';
+import { InjectRepository }                      from '@nestjs/typeorm';
+import { Repository }                            from 'typeorm';
+import { AuthDto }                               from '../dto/auth.dto';
+import { JwtService }                            from '@nestjs/jwt';
+import { Jwt, JwtPayload }                       from './Jwt';
+import * as bcrypt                               from 'bcrypt';
+import { CreateUserDto }                         from '../dto/create-user.dto';
+import { UserService }                           from '../user.service';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
 
-  constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
+  constructor(@InjectRepository(User) private userRepo: Repository<User>,
+              private userService: UserService,
+              private jwtService: JwtService) {}
 
   async login(auth: AuthDto): Promise<User> {
     const { login, password } = auth;
+    this.logger.debug({ login });
 
     const user = await this.userRepo.createQueryBuilder()
-      .where(' password = :password ', { password })
-      .andWhere(new Brackets((qb) => {
-        qb.where('nickname = :nickname', { nickname: login })
-          .orWhere('email = :email', { email: login });
-      }))
+      .where('username = :username', { username: login })
+      .orWhere('email = :email', { email: login })
       .getOne();
 
-    if (user === null) {
+    if (user === null || !await bcrypt.compare(password, user.password)) {
       throw new NotFoundException();
     }
 
     return user;
+  }
+
+  async loginJwt(user: User): Promise<Jwt> {
+    const payload: JwtPayload = { username: user.username, userId: user.id };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+
+  async signUp(createUser: CreateUserDto): Promise<User> {
+    const { password, ...user } = createUser;
+    const hash                  = await AuthService.hash(password);
+    return await this.userService.create({ ...user, password: hash });
+  }
+
+  private static async hash(plain: string, saltRounds = 10): Promise<string> {
+    return await bcrypt.hash(plain, saltRounds);
   }
 }

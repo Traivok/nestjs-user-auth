@@ -17,7 +17,7 @@ export class UserDto {
   email: string;
 
   @Expose()
-  nickname: string;
+  username: string;
 
   @Expose()
   role: UserRoles;

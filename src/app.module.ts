@@ -33,7 +33,6 @@ import getConfig                       from '../config';
     }),
 
     UserModule,
-
     CommonsModule,
   ],
   controllers: [],

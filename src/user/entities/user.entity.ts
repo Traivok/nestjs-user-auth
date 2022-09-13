@@ -26,7 +26,7 @@ export class User {
   email: string;
 
   @Column({ unique: true })
-  nickname: string;
+  username: string;
 
   @Column()
   password: string;

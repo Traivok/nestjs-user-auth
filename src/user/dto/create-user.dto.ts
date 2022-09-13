@@ -19,7 +19,7 @@ export class CreateUserDto {
   @Transform(({ value }) => value.toLocaleLowerCase())
   @IsString()
   @ApiProperty({ example: 'leroy_jenkins' })
-  nickname: string;
+  username: string;
 
   @IsString()
   @ApiProperty({ format: 'password' })
