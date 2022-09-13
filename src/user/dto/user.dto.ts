@@ -21,4 +21,7 @@ export class UserDto {
 
   @Expose()
   role: UserRoles;
+
+  @Expose()
+  createdAt: Date;
 }

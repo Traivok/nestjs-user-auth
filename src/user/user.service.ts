@@ -4,6 +4,9 @@ import { UpdateUserDto }      from './dto/update-user.dto';
 import { User }               from './entities/user.entity';
 import { InjectRepository }   from '@nestjs/typeorm';
 import { Repository }         from 'typeorm';
+import { PageDto }            from '../commons/pagination/page.dto';
+import { PageOptionsDto }     from '../commons/pagination/page-options.dto';
+import PageMetaDto            from '../commons/pagination/page-meta.dto';
 
 @Injectable()
 export class UserService {
@@ -19,6 +22,19 @@ export class UserService {
 
   async findAll(): Promise<User[]> {
     return this.userRepo.find();
+  }
+
+  async findAllPaginated(options: PageOptionsDto): Promise<PageDto<User>> {
+    const queryBuilder = this.userRepo.createQueryBuilder('user');
+
+    queryBuilder.orderBy('user.createdAt', options.order)
+      .skip(options.skip)
+      .take(options.take);
+
+    const [ users, itemCount ] = await queryBuilder.getManyAndCount();
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto: options });
+
+    return new PageDto<User>(users, pageMetaDto)
   }
 
   async findOne(id: number): Promise<User | undefined> {

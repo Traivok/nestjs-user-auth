@@ -1,6 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { Logger }                         from '@nestjs/common';
-import { Exclude }                        from 'class-transformer';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Logger }                                                   from '@nestjs/common';
+import { Exclude }                                                  from 'class-transformer';
 
 export enum UserRoles {
   admin = 'Admin',
@@ -37,4 +37,7 @@ export class User {
     default: UserRoles.user,
   })
   role: UserRoles;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }
