@@ -14,7 +14,6 @@ import { plainToInstance }                                                      
 
 
 @ApiTags('user')
-// @Serialize(UserDto)
 @Controller('user')
 @CatchEntityErrorsHandler(User.name)
 export class UserController {
@@ -31,11 +30,12 @@ export class UserController {
 
   @Get()
   @ApiPaginatedResponse(UserDto)
-  async findAll(@Query() pageOptions: PageOptionsDto): Promise<PageDto<UserDto>> {
-    const { data, meta }: PageDto<User> = await this.userService.findAllPaginated(pageOptions);
-    const users: UserDto[] = data.map(d => plainToInstance(UserDto, d, { excludeExtraneousValues: true })); // TODO decorate
-
-    return new PageDto<UserDto>(users, meta);
+  async findAll(@Query('pageOptions') pageOptions: PageOptionsDto): Promise<PageDto<UserDto>> {
+    const {meta, data} = await this.userService.findAllPaginated(pageOptions);
+    return new PageDto<UserDto>(
+      plainToInstance(UserDto, data, { excludeExtraneousValues: true }),
+      meta
+    );
   }
 
   @Get(':id')

@@ -1,10 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication }    from '@nestjs/common';
-import * as request            from 'supertest';
-import { Repository }          from 'typeorm';
-import { User }                from '../src/user/entities/user.entity';
-import { AppModule }           from '../src/app.module';
-import * as session            from 'express-session';
+import { Test, TestingModule }              from '@nestjs/testing';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
+import * as request                         from 'supertest';
+import { Repository }                       from 'typeorm';
+import { User }                             from '../src/user/entities/user.entity';
+import { AppModule }                        from '../src/app.module';
+import * as session                         from 'express-session';
 
 describe('Authentication Controller (e2e)', () => {
   let app: INestApplication;
@@ -26,6 +26,7 @@ describe('Authentication Controller (e2e)', () => {
     app = moduleFixture.createNestApplication();
 
     app.useLogger(console);
+    app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
     app.use(session({
       secret: 'secret',

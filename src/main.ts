@@ -6,11 +6,13 @@ import { UserModule }                     from './user/user.module';
 import * as session                       from 'express-session';
 import { ConfigService }                  from '@nestjs/config';
 import { string }                         from 'joi';
+import { ValidationPipe }                 from '@nestjs/common';
 
 ( async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useLogger([ 'log', 'warn', 'error', 'verbose', 'debug' ]);
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   const swaggerConf = new DocumentBuilder()
     .setTitle('User boilerplate')
