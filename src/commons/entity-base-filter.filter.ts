@@ -3,7 +3,12 @@ import { Response }                                   from 'express';
 
 export abstract class EntityBaseFilterFilter<T> implements ExceptionFilter {
   abstract readonly httpCode: HttpStatus;
+
   abstract get message(): string;
+
+  checkException(e: T): boolean {
+    return true;
+  }
 
   protected constructor(protected entityName: string) {}
 
@@ -12,10 +17,18 @@ export abstract class EntityBaseFilterFilter<T> implements ExceptionFilter {
     const res    = ctx.getResponse<Response>();
     const status = this.httpCode;
 
-    res.status(status)
-      .json({
-        statusCode: status,
-        message:    this.message,
-      });
+    if (this.checkException(exception)) {
+      res.status(status)
+        .json({
+          statusCode: status,
+          message:    this.message,
+        });
+    } else {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message:    'Internal Server Error',
+        });
+    }
   }
 }

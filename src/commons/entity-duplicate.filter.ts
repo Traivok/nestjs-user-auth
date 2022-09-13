@@ -13,4 +13,9 @@ export class EntityDuplicateFilter extends EntityBaseFilterFilter<QueryFailedErr
   constructor(entityName: string = 'Entity') {
     super(entityName);
   }
+
+  override checkException(e: QueryFailedError): boolean {
+    console.log({e});
+    return false;
+  }
 }

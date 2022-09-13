@@ -11,6 +11,7 @@ export const baseConfig: Config = {
 export const devConfig: Config = {
   ...baseConfig,
   DB_NAME: 'modo_dev',
+  DB_LOG: true,
 }
 
 export const testConfig: Config = {

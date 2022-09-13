@@ -1,13 +1,12 @@
-import { Module }                                        from '@nestjs/common';
-import { AppService }                                    from './app.service';
-import { UserModule }                                    from './user/user.module';
-import { ConfigModule, ConfigService }                   from '@nestjs/config';
-import { TypeOrmModule }                                 from '@nestjs/typeorm';
-import { User }                                          from './user/entities/user.entity';
-import * as Joi                                          from 'joi';
-import { CookieSessionModule, NestCookieSessionOptions } from 'nestjs-cookie-session';
-import { CommonsModule } from './commons/commons.module';
-import getConfig                                         from '../config';
+import { Module }                      from '@nestjs/common';
+import { AppService }                  from './app.service';
+import { UserModule }                  from './user/user.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule }               from '@nestjs/typeorm';
+import { User }                        from './user/entities/user.entity';
+import * as Joi                        from 'joi';
+import { CommonsModule }               from './commons/commons.module';
+import getConfig                       from '../config';
 
 @Module({
   imports:     [
@@ -33,18 +32,13 @@ import getConfig                                         from '../config';
       } ),
     }),
 
-    CookieSessionModule.forRootAsync({
-      inject:     [ ConfigService ],
-      useFactory: async (conf: ConfigService): Promise<NestCookieSessionOptions> => ( {
-        session: { secret: conf.get<string>('COOKIE_SECRET') },
-      } ),
-    }),
-
     UserModule,
 
     CommonsModule,
   ],
-  controllers: [ ],
+  controllers: [],
   providers:   [ AppService ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private configService: ConfigService) {}
+}

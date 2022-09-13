@@ -9,14 +9,14 @@ export class AuthService {
 
   constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
 
-  async signIn(auth: AuthDto): Promise<User> {
-    const { emailOrNickname, password } = auth;
+  async login(auth: AuthDto): Promise<User> {
+    const { login, password } = auth;
 
     const user = await this.userRepo.createQueryBuilder()
       .where(' password = :password ', { password })
       .andWhere(new Brackets((qb) => {
-        qb.where('nickname = :nickname', { nickname: emailOrNickname })
-          .orWhere('email = :email', { email: emailOrNickname });
+        qb.where('nickname = :nickname', { nickname: login })
+          .orWhere('email = :email', { email: login });
       }))
       .getOne();
 
