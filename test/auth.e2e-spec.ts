@@ -1,11 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TestingLogger }       from '@nestjs/testing/services/testing-logger.service';
 import { INestApplication }    from '@nestjs/common';
 import * as request            from 'supertest';
 import { Repository }          from 'typeorm';
 import { User }                from '../src/user/entities/user.entity';
 import { AppModule }           from '../src/app.module';
-import * as cookieParser       from 'cookie-parser';
+import * as session            from 'express-session';
 
 describe('Authentication Controller (e2e)', () => {
   let app: INestApplication;
@@ -26,8 +25,13 @@ describe('Authentication Controller (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
 
-    app.useLogger(new TestingLogger());
-    app.use(cookieParser());
+    app.useLogger(console);
+
+    app.use(session({
+      secret: 'secret',
+      resave: false,
+      saveUninitialized: false,
+    }));
 
     await app.init();
 
@@ -88,7 +92,7 @@ describe('Authentication Controller (e2e)', () => {
     expect(cookie).toBeDefined();
 
     const { body } = await request(app.getHttpServer())
-      .post('/auth/whoami')
+      .get('/auth/who-am-i')
       .set('Cookie', cookie)
       .expect(200);
 

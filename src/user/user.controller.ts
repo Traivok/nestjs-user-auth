@@ -6,7 +6,7 @@ import { ApiResponse, ApiTags }                                                 
 import { Serialize }                                                               from '../commons/serialize.interceptor';
 import { UserDto }                                                                 from './dto/user.dto';
 import { User }                                                                    from './entities/user.entity';
-import { CatchEntityErrorsHandler }                                                from '../commons/entity-errors-handler.filter';
+import { CatchEntityErrorsHandler }                                                from '../commons/filters/entity-errors-handler.filter';
 
 
 @ApiTags('user')

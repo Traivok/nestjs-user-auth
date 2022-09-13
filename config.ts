@@ -3,13 +3,13 @@ process.env.NODE_ENV = process.env.NODE_ENV ?? 'dev';
 export type Config = { [key: string]: any };
 
 export const baseConfig: Config = {
-  COOKIE_SECRET: 'fixme',
   DB_USER: process.env.USER,
   DB_SYNC: false,
 }
 
 export const devConfig: Config = {
   ...baseConfig,
+  COOKIE_SECRET: 'fixme',
   DB_NAME: 'modo_dev',
   DB_LOG: true,
 }
@@ -22,6 +22,7 @@ export const testConfig: Config = {
 
 export const prodConfig: Config = {
   ...baseConfig,
+  COOKIE_SECRET: 'fixme',
   DB_NAME: 'fixme',
 }
 

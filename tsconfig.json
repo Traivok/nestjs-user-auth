@@ -16,6 +16,14 @@
     "noImplicitAny": true,
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@app/commons": [
+        "libs/commons/src"
+      ],
+      "@app/commons/*": [
+        "libs/commons/src/*"
+      ]
+    }
   }
 }

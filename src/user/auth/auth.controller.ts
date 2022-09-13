@@ -12,13 +12,14 @@ import {
 import { ApiResponse, ApiTags }     from '@nestjs/swagger';
 import { UserDto }                  from '../dto/user.dto';
 import { Serialize }                from '../../commons/serialize.interceptor';
-import { User, UserRoles }         from '../entities/user.entity';
+import { User, UserRoles }          from '../entities/user.entity';
 import { AuthDto }                  from '../dto/auth.dto';
 import { AuthService }              from './auth.service';
-import { CatchEntityErrorsHandler } from '../../commons/entity-errors-handler.filter';
+import { CatchEntityErrorsHandler } from '../../commons/filters/entity-errors-handler.filter';
 import { CreateUserDto }            from '../dto/create-user.dto';
 import { UserService }              from '../user.service';
 import { CurrentUser }              from '../current-user.decorator';
+import { isNil }                    from '@nestjs/common/utils/shared.utils';
 
 @ApiTags('auth')
 @Serialize(UserDto)
@@ -48,12 +49,10 @@ export class AuthController {
     return await this.userService.create(newUser);
   }
 
-  @Get('whoami')
+  @Get('who-am-i')
   async whoAmi(@CurrentUser() user: User): Promise<User> {
-    if (user === null)
+    if (isNil(user))
       throw new NotFoundException();
-
-    this.logger.log({user});
 
     return user;
   }
