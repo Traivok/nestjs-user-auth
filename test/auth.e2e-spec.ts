@@ -1,9 +1,10 @@
-import { Test, TestingModule }              from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import * as request                         from 'supertest';
-import { Repository }                       from 'typeorm';
-import { User }                             from '../src/user/entities/user.entity';
-import { AppModule }                        from '../src/app.module';
+import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication }    from '@nestjs/common';
+import * as request            from 'supertest';
+import { Repository }          from 'typeorm';
+import { User }                from '../src/user/entities/user.entity';
+import { AppModule }           from '../src/app.module';
+import { appConfigure }        from '../src/AppConfigure';
 
 describe('Authentication Controller (e2e)', () => {
   let app: INestApplication;
@@ -23,9 +24,7 @@ describe('Authentication Controller (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-
-    // app.useLogger(console);
-    app.useGlobalPipes(new ValidationPipe({ transform: true }));
+    app = appConfigure(app);
 
     await app.init();
 

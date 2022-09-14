@@ -1,17 +1,17 @@
-import { Body, Controller, Get, HttpCode, Logger, Post, Request } from '@nestjs/common';
-import { ApiBody, ApiResponse, ApiTags }                          from '@nestjs/swagger';
-import { UserDto }                                                from '../dto/user.dto';
-import { Serialize }                                              from '../../commons/serialize.interceptor';
-import { User }                                                   from '../entities/user.entity';
-import { AuthService }                                            from './auth.service';
-import { CatchEntityErrorsHandler }                               from '../../commons/filters/entity-errors-handler.filter';
-import { CreateUserDto }                                          from '../dto/create-user.dto';
-import { UserService }                                            from '../user.service';
-import { AuthDto }                                                from '../dto/auth.dto';
-import { Jwt, JwtPayload }                                        from './Jwt';
-import { ApiJwtAuth }                                             from './decorators/api-jwt-auth.decorator';
-import { Express }                                                from './interfaces/request.interface';
-import { ApiLocalAuth }                                           from './decorators/api-local-auth.decorator';
+import { Body, Controller, Get, HttpCode, Logger, Post, Request, Session } from '@nestjs/common';
+import { ApiBody, ApiResponse, ApiTags }                                   from '@nestjs/swagger';
+import { UserDto }                                                         from '../dto/user.dto';
+import { Serialize }                                                       from '../../commons/serialize.interceptor';
+import { User }                                                            from '../entities/user.entity';
+import { AuthService }                                                     from './auth.service';
+import { CatchEntityErrorsHandler }                                        from '../../commons/filters/entity-errors-handler.filter';
+import { CreateUserDto }                                                   from '../dto/create-user.dto';
+import { UserService }                                                     from '../user.service';
+import { AuthDto }                                                         from '../dto/auth.dto';
+import { Jwt, JwtPayload }                                                 from './Jwt';
+import { ApiJwtAuth }                                                      from './decorators/api-jwt-auth.decorator';
+import { Express }                                                         from './interfaces/request.interface';
+import { ApiLocalAuth }                                                    from './decorators/api-local-auth.decorator';
 
 type ExpressRequest = Express.Request;
 
@@ -29,8 +29,10 @@ export class AuthController {
   @HttpCode(200)
   @ApiBody({ type: AuthDto, required: true })
   @ApiResponse({ type: Jwt })
-  async login(@Request() req: ExpressRequest): Promise<Jwt> {
-    return await this.authService.loginJwt(req.user as User);
+  async login(@Request() req: ExpressRequest, @Session() session: Record<string, any>): Promise<Jwt> {
+    const jwt = await this.authService.loginJwt(req.user as User);
+    this.authService.setJwtToSession(session, jwt);
+    return jwt;
   }
 
   @Post('sign-up')
@@ -46,5 +48,10 @@ export class AuthController {
   async profile(@Request() req: ExpressRequest): Promise<User> {
     const payload = req.user as JwtPayload;
     return this.userService.findOneOrFail(payload.id);
+  }
+
+  @Post('logout-session')
+  async logoutSession(@Request() req: ExpressRequest, @Session() session: Record<string, any>) {
+    this.authService.removeJwtOfSession(session);
   }
 }

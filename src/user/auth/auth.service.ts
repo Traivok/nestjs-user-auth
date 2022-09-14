@@ -9,6 +9,8 @@ import * as bcrypt                               from 'bcrypt';
 import { CreateUserDto }                         from '../dto/create-user.dto';
 import { UserService }                           from '../user.service';
 import { UpdateUserDto }                         from '../dto/update-user.dto';
+import { ExtractJwt, JwtFromRequestFunction }    from 'passport-jwt';
+import { isNil }                                 from '@nestjs/common/utils/shared.utils';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +22,6 @@ export class AuthService {
 
   async login(auth: AuthDto): Promise<User> {
     const { login, password } = auth;
-    this.logger.debug({ login });
 
     const user = await this.userRepo.createQueryBuilder()
       .where('username = :username', { username: login })
@@ -60,5 +61,33 @@ export class AuthService {
     }
 
     return await this.userService.update(id, toUpdate);
+  }
+
+  public getJwtFromSession(session: Record<string, any>): Jwt | null {
+    return 'jwt' in session ? session['jwt'] : null;
+  }
+
+  public setJwtToSession(session: Record<string, any>, jwt: Jwt) {
+    session['jwt'] = jwt;
+    return session;
+  }
+
+  public removeJwtOfSession(session: Record<string, any>) {
+    delete session['jwt'];
+  }
+
+  public fromSessionAsBearerToken(): JwtFromRequestFunction {
+    return (req): string | null => {
+      const session: Record<string, any> | null | undefined = req.session;
+
+      return isNil(session) ? null : this.getJwtFromSession(session)?.access_token ?? null;
+    }
+  }
+
+  public getExtractingMethods(): JwtFromRequestFunction {
+    return ExtractJwt.fromExtractors([
+      this.fromSessionAsBearerToken(),
+      ExtractJwt.fromAuthHeaderAsBearerToken(),
+    ])
   }
 }

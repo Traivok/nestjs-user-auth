@@ -6,5 +6,6 @@ export namespace Express {
      * @description passport automatically set property
      */
     user?: JwtPayload;
+    logout: Function;
   }
 }

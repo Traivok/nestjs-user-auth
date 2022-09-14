@@ -3,13 +3,12 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule }                      from './app.module';
 import { CommonsModule }                  from './commons/commons.module';
 import { UserModule }                     from './user/user.module';
-import { ValidationPipe }                 from '@nestjs/common';
+import { appConfigure }                   from './AppConfigure';
 
 ( async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = appConfigure(await NestFactory.create(AppModule));
 
   app.useLogger([ 'log', 'warn', 'error', 'verbose', 'debug' ]);
-  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   const swaggerConf = new DocumentBuilder()
     .setTitle('User boilerplate')
