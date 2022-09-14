@@ -1,9 +1,10 @@
-import { Catch, HttpStatus }      from '@nestjs/common';
-import { QueryFailedError }       from 'typeorm';
-import { EntityBaseFilterFilter } from './entity-base-filter.filter';
+import { Catch, HttpStatus, Logger } from '@nestjs/common';
+import { QueryFailedError }          from 'typeorm';
+import { EntityBaseFilterFilter }    from './entity-base-filter.filter';
 
 @Catch(QueryFailedError)
 export class EntityDuplicateFilter extends EntityBaseFilterFilter<QueryFailedError> {
+  protected readonly logger = new Logger(EntityDuplicateFilter.name);
   readonly httpCode = HttpStatus.CONFLICT;
 
   get message(): string {
@@ -15,7 +16,6 @@ export class EntityDuplicateFilter extends EntityBaseFilterFilter<QueryFailedErr
   }
 
   override checkException(e: QueryFailedError): boolean {
-    console.log({e});
-    return false;
+    return Number(e.driverError.code) === 23505;
   }
 }

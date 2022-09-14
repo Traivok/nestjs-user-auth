@@ -10,7 +10,7 @@ describe('Authentication Controller (e2e)', () => {
   let repo: Repository<User>;
   let userId: number;
   const user = {
-    'email':     'user@example.com',
+    'email':     'user0old@example.com',
     'firstname': 'John',
     'lastname':  'Doe',
     'username':  'john.doe',

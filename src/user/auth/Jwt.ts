@@ -1,11 +1,8 @@
 import { ApiExposedProperty } from '../../commons/decorators/api-exposed-property.decorator';
 
-export class JwtPayload {
+export class JwtPayload  {
   @ApiExposedProperty()
-  username: string;
-
-  @ApiExposedProperty()
-  userId: number;
+  id: number;
 }
 
 export class Jwt {

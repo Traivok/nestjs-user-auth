@@ -9,7 +9,7 @@ import { ValidationPipe }                 from '@nestjs/common';
   const app = await NestFactory.create(AppModule);
 
   app.useLogger([ 'log', 'warn', 'error', 'verbose', 'debug' ]);
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   const swaggerConf = new DocumentBuilder()
     .setTitle('User boilerplate')

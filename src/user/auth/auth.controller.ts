@@ -1,30 +1,19 @@
-import { Body, Controller, ForbiddenException, Get, HttpCode, Logger, Post, Request, UseGuards } from '@nestjs/common';
-import {
-  ApiBody,
-  ApiResponse,
-  ApiTags,
-}                                                                                                 from '@nestjs/swagger';
-import { UserDto }                                                                                from '../dto/user.dto';
-import { Serialize }                                                                              from '../../commons/serialize.interceptor';
-import {
-  User,
-  UserRoles,
-}                                                                                                 from '../entities/user.entity';
-import { Request as ExpressRequest }                                                              from 'express';
-import { AuthService }                                                                            from './auth.service';
-import { CatchEntityErrorsHandler }                                                               from '../../commons/filters/entity-errors-handler.filter';
-import { CreateUserDto }                                                                          from '../dto/create-user.dto';
-import { UserService }                                                                            from '../user.service';
-import { AuthGuard }                                                                              from '@nestjs/passport';
-import { AuthDto }                                                                                from '../dto/auth.dto';
-import { Jwt, JwtPayload }                                                                        from './Jwt';
-import { ApiJwtAuth }                                                                             from './decorators/api-jwt-auth.decorator';
+import { Body, Controller, Get, HttpCode, Logger, Post, Request } from '@nestjs/common';
+import { ApiBody, ApiResponse, ApiTags }                          from '@nestjs/swagger';
+import { UserDto }                                                from '../dto/user.dto';
+import { Serialize }                                              from '../../commons/serialize.interceptor';
+import { User }                                                   from '../entities/user.entity';
+import { AuthService }                                            from './auth.service';
+import { CatchEntityErrorsHandler }                               from '../../commons/filters/entity-errors-handler.filter';
+import { CreateUserDto }                                          from '../dto/create-user.dto';
+import { UserService }                                            from '../user.service';
+import { AuthDto }                                                from '../dto/auth.dto';
+import { Jwt, JwtPayload }                                        from './Jwt';
+import { ApiJwtAuth }                                             from './decorators/api-jwt-auth.decorator';
+import { Express }                                                from './interfaces/request.interface';
+import { ApiLocalAuth }                                           from './decorators/api-local-auth.decorator';
 
-namespace Express {
-  interface Request {
-    user: User | null;
-  }
-}
+type ExpressRequest = Express.Request;
 
 @ApiTags('auth')
 @Controller('auth')
@@ -35,7 +24,7 @@ export class AuthController {
   constructor(private authService: AuthService,
               private userService: UserService) {}
 
-  @UseGuards(AuthGuard('local'))
+  @ApiLocalAuth()
   @Post('login')
   @HttpCode(200)
   @ApiBody({ type: AuthDto, required: true })
@@ -48,10 +37,6 @@ export class AuthController {
   @ApiResponse({ type: UserDto })
   @Serialize(UserDto)
   async signUp(@Body() newUser: CreateUserDto): Promise<User> {
-    if (newUser.role && newUser.role !== UserRoles.user) {
-      throw new ForbiddenException('New users should have \'User\' role');
-    }
-
     return await this.authService.signUp(newUser);
   }
 
@@ -60,6 +45,6 @@ export class AuthController {
   @Serialize(UserDto)
   async profile(@Request() req: ExpressRequest): Promise<User> {
     const payload = req.user as JwtPayload;
-    return this.userService.findOneOrFail(payload.userId);
+    return this.userService.findOneOrFail(payload.id);
   }
 }

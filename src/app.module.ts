@@ -1,5 +1,4 @@
 import { Module }                      from '@nestjs/common';
-import { AppService }                  from './app.service';
 import { UserModule }                  from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule }               from '@nestjs/typeorm';
@@ -36,7 +35,7 @@ import getConfig                       from '../config';
     CommonsModule,
   ],
   controllers: [],
-  providers:   [ AppService ],
+  providers:   [],
 })
 export class AppModule {
   constructor(private configService: ConfigService) {}

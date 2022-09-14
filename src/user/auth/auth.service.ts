@@ -8,6 +8,7 @@ import { Jwt, JwtPayload }                       from './Jwt';
 import * as bcrypt                               from 'bcrypt';
 import { CreateUserDto }                         from '../dto/create-user.dto';
 import { UserService }                           from '../user.service';
+import { UpdateUserDto }                         from '../dto/update-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -34,7 +35,7 @@ export class AuthService {
   }
 
   async loginJwt(user: User): Promise<Jwt> {
-    const payload: JwtPayload = { username: user.username, userId: user.id };
+    const payload: JwtPayload = { id: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -48,5 +49,16 @@ export class AuthService {
 
   private static async hash(plain: string, saltRounds = 10): Promise<string> {
     return await bcrypt.hash(plain, saltRounds);
+  }
+
+  async update(id: number, updateUser: UpdateUserDto): Promise<User> {
+    let toUpdate = updateUser;
+
+    if (updateUser.password !== undefined) {
+      const hash = await AuthService.hash(updateUser.password);
+      toUpdate = { ...toUpdate, password: hash };
+    }
+
+    return await this.userService.update(id, toUpdate);
   }
 }

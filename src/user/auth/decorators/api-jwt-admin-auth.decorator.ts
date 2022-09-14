@@ -4,6 +4,6 @@ import { AuthGuard }                  from '@nestjs/passport';
 
 export const ApiBearerAccessToken = () => ApiBearerAuth('access_token');
 
-export const ApiJwtAuth = () => applyDecorators(
+export const ApiJwtAdminAuth = () => applyDecorators(
   ApiBearerAccessToken(),
-  UseGuards(AuthGuard('jwt')));
+  UseGuards(AuthGuard('jwt-admin')));

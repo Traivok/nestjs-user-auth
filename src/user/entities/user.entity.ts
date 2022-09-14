@@ -1,12 +1,6 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { Logger }                                                   from '@nestjs/common';
-import { Exclude }                                                  from 'class-transformer';
-
-export enum UserRoles {
-  admin = 'Admin',
-  manager = 'Manager',
-  user = 'User',
-}
+import { BeforeRemove, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Logger }                                                                 from '@nestjs/common';
+import { Exclude }                                                                from 'class-transformer';
 
 @Entity('users')
 export class User {
@@ -31,13 +25,14 @@ export class User {
   @Column()
   password: string;
 
-  @Column({
-    type: 'enum',
-    enum: UserRoles,
-    default: UserRoles.user,
-  })
-  role: UserRoles;
+  @Column({ name: 'is_admin', default: false, })
+  isAdmin: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
+
+  @BeforeRemove()
+  logRemoval() {
+    this.logger.log('Removing user0old: ' + this.username);
+  }
 }

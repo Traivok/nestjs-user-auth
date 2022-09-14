@@ -1,12 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { CreateUserDto }      from './dto/create-user.dto';
-import { UpdateUserDto }      from './dto/update-user.dto';
-import { User }               from './entities/user.entity';
-import { InjectRepository }   from '@nestjs/typeorm';
-import { Repository }         from 'typeorm';
-import { PageDto }            from '../commons/pagination/page.dto';
-import { PageOptionsDto }     from '../commons/pagination/page-options.dto';
-import PageMetaDto            from '../commons/pagination/page-meta.dto';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import { CreateUserDto }                          from './dto/create-user.dto';
+import { UpdateUserDto }                          from './dto/update-user.dto';
+import { User }                                   from './entities/user.entity';
+import { InjectRepository }                       from '@nestjs/typeorm';
+import { Repository }                             from 'typeorm';
+import { PageDto }                                from '../commons/pagination/page.dto';
+import { PageOptionsDto }                         from '../commons/pagination/page-options.dto';
+import PageMetaDto                                from '../commons/pagination/page-meta.dto';
 
 @Injectable()
 export class UserService {
@@ -27,14 +27,14 @@ export class UserService {
   async findAllPaginated(options: PageOptionsDto): Promise<PageDto<User>> {
     const queryBuilder = this.userRepo.createQueryBuilder('user');
 
-    queryBuilder.orderBy('user.createdAt', options.order)
+    queryBuilder.orderBy('user0old.createdAt', options.order)
       .skip(options.skip)
       .take(options.take);
 
     const [ users, itemCount ] = await queryBuilder.getManyAndCount();
-    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto: options });
+    const pageMetaDto          = new PageMetaDto({ itemCount, pageOptionsDto: options });
 
-    return new PageDto<User>(users, pageMetaDto)
+    return new PageDto<User>(users, pageMetaDto);
   }
 
   async findOne(id: number): Promise<User | undefined> {
@@ -53,5 +53,10 @@ export class UserService {
   async remove(id: number): Promise<User> {
     const user = await this.findOneOrFail(id);
     return await this.userRepo.remove(user);
+  }
+
+  checkOwnership(target_id: number, actor: User) {
+    if (!actor.isAdmin && target_id !== actor.id)
+      throw new ForbiddenException(`User ${ actor.username } has not ownership over user.id = ${ target_id }`);
   }
 }

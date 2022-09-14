@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose }      from 'class-transformer';
-import { UserRoles }   from '../entities/user.entity';
 
 export class UserDto {
   @Expose()
@@ -20,7 +19,7 @@ export class UserDto {
   username: string;
 
   @Expose()
-  role: UserRoles;
+  isAdmin: boolean;
 
   @Expose()
   createdAt: Date;

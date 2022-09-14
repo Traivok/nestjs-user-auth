@@ -1,7 +1,8 @@
-import { ArgumentsHost, ExceptionFilter, HttpStatus } from '@nestjs/common';
-import { Response }                                   from 'express';
+import { ArgumentsHost, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
+import { Response }                                           from 'express';
 
 export abstract class EntityBaseFilterFilter<T> implements ExceptionFilter {
+  protected readonly logger = new Logger(EntityBaseFilterFilter.name);
   abstract readonly httpCode: HttpStatus;
 
   abstract get message(): string;
@@ -24,6 +25,7 @@ export abstract class EntityBaseFilterFilter<T> implements ExceptionFilter {
           message:    this.message,
         });
     } else {
+      this.logger.error(exception);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({
           statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
